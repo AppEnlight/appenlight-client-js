@@ -8,7 +8,6 @@
 //          var err_client = new Errormator();
 //          window.err_client = err_client;
 //          err_client.init({
-//              server: 'http://127.0.0.1:6543',
 //              api_key:'PUBLIC_API_KEY',
 //              window_on_error: 1 // enable to hook to window.onerror
 //          });
@@ -111,7 +110,6 @@ function Errormator() {
     };
 
     this.handleError = function (errorReport) {
-        console.log(errorReport);
         if (errorReport.mode == 'stack'){
             var error_type = errorReport.name + ': '+errorReport.message;
         }
