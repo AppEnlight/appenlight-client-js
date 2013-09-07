@@ -38,6 +38,9 @@ Installation and Setup
     p.parentNode.insertBefore(emator, p);
 
 
+At this point client is configured and will automaticly stream all data to
+our servers every 1 second if it has anything in its buffers.
+
 **ERROR CATCHING - EXAMPLE**::
 
     try{
