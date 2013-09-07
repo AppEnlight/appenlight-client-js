@@ -5,13 +5,13 @@ errormator_client_javascript
    :alt: JS Logo
 
 
-**WARNING THIS IS STILL UNFINISHED ALPHA CODE**
+**WARNING THIS IS STILL ALPHA CODE - USE AT YOUR OWN RISK**
 
 
 Installation and Setup
 ======================
 
-Load the script asynchroneously::
+**Load the script asynchroneously**::
 
     var init_errormator = function () {
           var err_client = new Errormator();
@@ -20,7 +20,7 @@ Load the script asynchroneously::
               api_key:'PUBLIC_API_KEY',
               window_on_error: 1 // enable to hook to window.onerror
           });
-          // setting request info is optional
+          // setting request info is completly optional
           err_client.setRequestInfo({
               server:'servername',
               username:'i_am_mario',
@@ -38,7 +38,7 @@ Load the script asynchroneously::
     p.parentNode.insertBefore(emator, p);
 
 
-EXAMPLE USAGE::
+**EXAMPLE USAGE**::
 
     // wait for client to load to test error
     setTimeout(function(){
