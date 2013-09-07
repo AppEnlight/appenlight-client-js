@@ -1,43 +1,5 @@
 "use strict";
 
-//
-// WARNING THIS IS STILL UNFINISHED ALPHA CODE
-//
-// EXAMPLE USAGE
-//    var init_errormator = function () {
-//          var err_client = new Errormator();
-//          window.err_client = err_client;
-//          err_client.init({
-//              api_key:'PUBLIC_API_KEY',
-//              window_on_error: 1 // enable to hook to window.onerror
-//          });
-//          // setting request info is optional
-//          err_client.setRequestInfo({
-//              server:'servername',
-//              username:'i_am_mario',
-//              ip: "127.0.0.1",
-//              request_id:"server_generated_uuid"
-//          });
-//    };
-//    //  load the script asynchroneously
-//    var emator = document.createElement('script');
-//    emator.type = 'text/javascript';
-//    emator.async = true;
-//    emator.onload = emator.onreadystatechange = init_errormator;
-//    emator.src = "/path/to/errormator-client.js";
-//    var p = document.getElementsByTagName('script')[0];
-//    p.parentNode.insertBefore(emator, p);
-//
-//    // TEST
-//    // wait for client to load to test error
-//    setTimeout(function(){
-//        try{
-//          1 + vcvx1;
-//        }catch(exc){
-//          err_client.grabError(exc);
-//        }
-//    },5000);
-
 function Errormator() {
     var self = this;
     this.options = {
@@ -116,6 +78,7 @@ function Errormator() {
         else{
             var error_type = errorReport.message;
         }
+        // console.log(errorReport);
         var report = {
             "client": "javascript",
             "language": "javascript",
@@ -130,6 +93,16 @@ function Errormator() {
             report.server = this.requestInfo.server;
         }
         var detail = this.collectDetails();
+        for (var i = errorReport.stack.length -1; i>=0; i--){
+            // console.log(errorReport.stack[i])
+             var stackline = {'cline': '',
+              'file': errorReport.stack[i].url,
+              'fn': errorReport.stack[i].func,
+              'line': errorReport.stack[i].line,
+              'vars': []}
+            detail.frameinfo.push(stackline);
+        }
+        detail.frameinfo[detail.frameinfo.length-1].cline = error_type
         report.report_details.push(detail);
         this.error_report_buffer.push(report);
     };
@@ -202,6 +175,7 @@ function Errormator() {
             url: window.location.href,
             user_agent: window.navigator.userAgent,
             start_time: new Date().toJSON(),
+            frameinfo:[]
         };
         if (this.requestInfo != null) {
             for (var i in this.requestInfo) {
