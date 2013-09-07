@@ -114,12 +114,15 @@ function Errormator() {
             var uuid = null;
         }
         this.log_buffer.push(
-            {"server": this.options.details.server,
+            {
                 "log_level": level.toUpperCase(),
                 "message": message,
                 "date": new Date().toJSON(),
                 "namespace": namespace
             })
+        if (this.requestInfo != null && typeof this.requestInfo.server != 'undefined') {
+            this.log_buffer[this.log_buffer.length-1].server = this.requestInfo.server;
+        }
     };
 
     this.gen_uuid4 = function () {

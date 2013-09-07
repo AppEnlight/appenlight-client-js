@@ -38,13 +38,18 @@ Installation and Setup
     p.parentNode.insertBefore(emator, p);
 
 
-**EXAMPLE USAGE**::
+**ERROR CATCHING - EXAMPLE**::
 
-    // wait for client to load to test error
-    setTimeout(function(){
-        try{
-          1 + vcvx1;
-        }catch(exc){
-          err_client.grabError(exc);
-        }
-    },5000);
+    try{
+      1 + vcvx1;
+    }catch(exc){
+      err_client.grabError(exc);
+    }
+
+
+
+**ERROR CATCHING - EXAMPLE**::
+
+    err_client.log('error',"some test message");
+    err_client.log('info',"some info message");
+    err_client.log('warning',"some warn message");
