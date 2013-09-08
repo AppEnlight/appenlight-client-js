@@ -51,7 +51,7 @@ our servers every 1 second if it has anything in its buffers.
 
 
 
-**ERROR CATCHING - EXAMPLE**::
+**LOGGING - EXAMPLE**::
 
     err_client.log('error',"some test message");
     err_client.log('info',"some info message");
