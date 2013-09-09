@@ -41,7 +41,13 @@ Installation and Setup
 At this point client is configured and will automaticly stream all data to
 our servers every 1 second if it has anything in its buffers.
 
-**ERROR CATCHING - EXAMPLE**::
+If `window_on_error` config option is enabled the client will process all unhandled
+exceptions for you. Remember though that window.onerror stacks contain minimal amount
+of information, for best results you want to do explict exception catching.
+
+Please *avoid* throwing string exceptions, if possible use `throw new Error()` instead.
+
+** EXPLICIT ERROR CATCHING - EXAMPLE**::
 
     try{
       1 + vcvx1;
