@@ -5,7 +5,7 @@ errormator_client_javascript
    :alt: JS Logo
 
 
-**WARNING THIS IS STILL ALPHA CODE - USE AT YOUR OWN RISK**
+** BETA CLIENT - feel free to submit pull requests **
 
 
 Installation and Setup
