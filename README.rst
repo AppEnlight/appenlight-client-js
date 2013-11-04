@@ -5,7 +5,7 @@ errormator_client_javascript
    :alt: JS Logo
 
 
-** BETA CLIENT - feel free to submit pull requests **
+**BETA CLIENT - feel free to submit pull requests**
 
 
 Installation and Setup
