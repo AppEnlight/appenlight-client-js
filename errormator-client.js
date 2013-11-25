@@ -1,6 +1,6 @@
 "use strict";
 
-function Errormator() {
+function Appenlight() {
     var self = this;
     this.options = {
         api_key: "",
@@ -12,7 +12,7 @@ function Errormator() {
 
     this.init = function (options) {
         if (typeof options.server == 'undefined') {
-            options.server = "https://api.errormator.com";
+            options.server = "https://api.appenlight.com";
         }
         if (typeof options.api_key == 'undefined') {
             options.api_key = "undefined";

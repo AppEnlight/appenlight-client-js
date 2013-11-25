@@ -1,20 +1,21 @@
-errormator_client_javascript
+appenlight_client_javascript
 ============================
 
-.. image:: https://errormator.com/static/images/logos/js_small.png
+.. image:: https://appenlight.com/static/images/logos/js_small.png
    :alt: JS Logo
 
 
 **WARNING THIS IS STILL ALPHA CODE - USE AT YOUR OWN RISK**
 
+Latest version of documentation is present on http://appenlight.com/page/javascript/client-configuration.
 
 Installation and Setup
 ======================
 
 **Load the script asynchroneously**::
 
-    var init_errormator = function () {
-          var err_client = new Errormator();
+    var init_appenlight = function () {
+          var err_client = new Appenlight();
           window.err_client = err_client;
           err_client.init({
               api_key:'PUBLIC_API_KEY',
@@ -29,11 +30,11 @@ Installation and Setup
           });
     };
     //  load the script asynchroneously
-    var emator = document.createElement('script');
-    emator.type = 'text/javascript';
-    emator.async = true;
-    emator.onload = emator.onreadystatechange = init_errormator;
-    emator.src = "/path/to/errormator-client.js";
+    var app_enlight = document.createElement('script');
+    app_enlight.type = 'text/javascript';
+    app_enlight.async = true;
+    app_enlight.onload = emator.onreadystatechange = init_appenlight;
+    app_enlight.src = "/path/to/appenlight-client.js";
     var p = document.getElementsByTagName('script')[0];
     p.parentNode.insertBefore(emator, p);
 
