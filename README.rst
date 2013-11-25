@@ -5,7 +5,7 @@ appenlight_client_javascript
    :alt: JS Logo
 
 
-**WARNING THIS IS STILL ALPHA CODE - USE AT YOUR OWN RISK**
+**BETA CLIENT - feel free to submit pull requests**
 
 Latest version of documentation is present on http://appenlight.com/page/javascript/client-configuration.
 
