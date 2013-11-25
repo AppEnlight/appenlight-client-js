@@ -36,7 +36,7 @@ Installation and Setup
     app_enlight.onload = emator.onreadystatechange = init_appenlight;
     app_enlight.src = "/path/to/appenlight-client.js";
     var p = document.getElementsByTagName('script')[0];
-    p.parentNode.insertBefore(emator, p);
+    p.parentNode.insertBefore(app_enlight, p);
 
 
 At this point client is configured and will automaticly stream all data to
