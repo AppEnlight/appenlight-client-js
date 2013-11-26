@@ -15,14 +15,14 @@ Installation and Setup
 **Load the script asynchroneously**::
 
     var init_appenlight = function () {
-          var err_client = new Appenlight();
-          window.err_client = err_client;
-          err_client.init({
+          var appenlight_client = new Appenlight();
+          window.appenlight_client = appenlight_client;
+          appenlight_client.init({
               api_key:'PUBLIC_API_KEY',
               window_on_error: 1 // enable to hook to window.onerror
           });
           // setting request info is completly optional
-          err_client.setRequestInfo({
+          appenlight_client.setRequestInfo({
               server:'servername',
               username:'i_am_mario',
               ip: "127.0.0.1",
@@ -33,8 +33,8 @@ Installation and Setup
     var app_enlight = document.createElement('script');
     app_enlight.type = 'text/javascript';
     app_enlight.async = true;
-    app_enlight.onload = emator.onreadystatechange = init_appenlight;
-    app_enlight.src = "/path/to/appenlight-client.js";
+    app_enlight.onload = app_enlight.onreadystatechange = init_appenlight;
+    app_enlight.src = "/path/js/appenlight-client.js";
     var p = document.getElementsByTagName('script')[0];
     p.parentNode.insertBefore(app_enlight, p);
 
@@ -53,7 +53,7 @@ Please *avoid* throwing string exceptions, if possible use `throw new Error()` i
     try{
       1 + vcvx1;
     }catch(exc){
-      err_client.grabError(exc);
+      appenlight_client.grabError(exc);
     }
 
 
