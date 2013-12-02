@@ -15,6 +15,7 @@ Installation and Setup
 **Load the script asynchroneously**::
 
     var init_appenlight = function () {
+      if(this.readyState!='loading'){
           var appenlight_client = new Appenlight();
           window.appenlight_client = appenlight_client;
           appenlight_client.init({
@@ -28,6 +29,7 @@ Installation and Setup
               ip: "127.0.0.1",
               request_id:"server_generated_uuid"
           });
+      }
     };
     //  load the script asynchroneously
     var app_enlight = document.createElement('script');
