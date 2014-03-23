@@ -14,15 +14,13 @@ Installation and Setup
 
 **Load the script asynchroneously**::
 
-    var init_appenlight = function () {
-          var appenlight_client = new Appenlight();
-          window.appenlight_client = appenlight_client;
-          appenlight_client.init({
-              api_key:'PUBLIC_API_KEY',
-              window_on_error: 1 // enable to hook to window.onerror
+    var initAppEnlight = function () {
+          AppEnlight.init({
+              apiKey:'PUBLIC_API_KEY',
+              windowOnError: 1 // enable to hook to window.onerror
           });
           // setting request info is completly optional
-          appenlight_client.setRequestInfo({
+          AppEnlight.setRequestInfo({
               server:'servername',
               username:'i_am_mario',
               ip: "127.0.0.1",
@@ -30,19 +28,19 @@ Installation and Setup
           });
     };
     //  load the script asynchroneously
-    var app_enlight = document.createElement('script');
-    app_enlight.type = 'text/javascript';
-    app_enlight.async = true;
-    app_enlight.onload = app_enlight.onreadystatechange = init_appenlight;
-    app_enlight.src = "/path/js/appenlight-client.js";
+    var scrElem = document.createElement('script');
+    scrElem.type = 'text/javascript';
+    scrElem.async = true;
+    scrElem.onload = scrElem.onreadystatechange = initAppEnlight;
+    scrElem.src = "/static/js/appenlight-client.js";
     var p = document.getElementsByTagName('script')[0];
-    p.parentNode.insertBefore(app_enlight, p);
+    p.parentNode.insertBefore(scrElem, p);
 
 
 At this point client is configured and will automaticly stream all data to
 our servers every 1 second if it has anything in its buffers.
 
-If `window_on_error` config option is enabled the client will process all unhandled
+If `windowOnError` config option is enabled the client will process all unhandled
 exceptions for you. Remember though that window.onerror stacks contain minimal amount
 of information, for best results you want to do explict exception catching.
 
@@ -51,15 +49,15 @@ Please *avoid* throwing string exceptions, if possible use `throw new Error()` i
 ** EXPLICIT ERROR CATCHING - EXAMPLE**::
 
     try{
-      1 + vcvx1;
+      1 + non_existing_var;
     }catch(exc){
-      appenlight_client.grabError(exc);
+      AppEnlight.grabError(exc);
     }
 
 
 
 **LOGGING - EXAMPLE**::
 
-    err_client.log('error',"some test message");
-    err_client.log('info',"some info message");
-    err_client.log('warning',"some warn message");
+    AppEnlight.log('error',"some test message");
+    AppEnlight.log('info',"some info message");
+    AppEnlight.log('warning',"some warn message");
