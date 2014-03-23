@@ -7,7 +7,16 @@ appenlight_client_javascript
 
 **BETA CLIENT - feel free to submit pull requests**
 
-Latest version of documentation is present on http://appenlight.com/page/javascript/client-configuration.
+Usage Example
+-------------
+
+## Include the script on your page
+
+First, please obtain latest copy of javascript client from our [**Github repository**](https://github.com/AppEnlight/appenlight-client-js).
+
+Or use CDN hosted version from jsDelivr (http://www.jsdelivr.com/#!appenlight).
+
+Next you can include the file on your pages directly or asynchroneously:
 
 Installation and Setup
 ======================
@@ -34,7 +43,7 @@ Installation and Setup
     scrElem.type = 'text/javascript';
     scrElem.async = true;
     scrElem.onload = scrElem.onreadystatechange = initAppEnlight;
-    scrElem.src = "/static/js/appenlight-client.js";
+    scrElem.src = "//cdn.jsdelivr.net/appenlight/0.2.0/appenlight-client.min.js";
     var p = document.getElementsByTagName('script')[0];
     p.parentNode.insertBefore(scrElem, p);
 
