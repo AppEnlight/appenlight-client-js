@@ -1,0 +1,13 @@
+{
+    "name": "appenlight-client",
+    "description": "Javascript client for App Enlight",
+    "devDependencies": {
+        "grunt": "",
+        "grunt-contrib-jshint": "",
+        "grunt-contrib-nodeunit": "",
+        "grunt-contrib-uglify": "",
+        "grunt-contrib-concat": "",
+        "grunt-contrib-watch": ""
+    }
+}
+
