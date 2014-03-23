@@ -15,6 +15,7 @@ Installation and Setup
 **Load the script asynchroneously**::
 
     var initAppEnlight = function () {
+      if(this.readyState!='loading'){
           AppEnlight.init({
               apiKey:'PUBLIC_API_KEY',
               windowOnError: 1 // enable to hook to window.onerror
@@ -26,6 +27,7 @@ Installation and Setup
               ip: "127.0.0.1",
               request_id:"server_generated_uuid"
           });
+      }
     };
     //  load the script asynchroneously
     var scrElem = document.createElement('script');
