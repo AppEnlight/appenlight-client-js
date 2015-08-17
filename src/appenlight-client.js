@@ -2,7 +2,7 @@
     "use strict";
 
     var AppEnlight = {
-        version: '0.2.0',
+        version: '0.3.0',
         options: {
             apiKey: ""
         },
@@ -20,7 +20,7 @@
                 options.apiKey = "undefined";
             }
             if (typeof options.protocol_version == 'undefined') {
-                options.protocol_version = "0.4";
+                options.protocol_version = "0.5";
             }
             if (typeof options.windowOnError == 'undefined' ||
                 options.windowOnError == false) {
@@ -33,7 +33,7 @@
                 this.createSendInterval(options.sendInterval);
             }
             this.options = options;
-            this.requestInfo = {url:window.location.href};
+            this.requestInfo = { url: window.location.href };
             this.reportsEndpoint = options.server
                 + '/api/reports?public_api_key=' + this.options.apiKey
                 + "&protocol_version=" + this.options.protocol_version;
@@ -74,7 +74,7 @@
 
         handleError: function (errorReport) {
             if (errorReport.mode == 'stack') {
-                var error_type = errorReport.name + ': ' + errorReport.message;
+                var error_msg = errorReport.name + ': ' + errorReport.message;
             }
             else {
                 var error_type = errorReport.message;
@@ -83,28 +83,39 @@
             var report = {
                 "client": "javascript",
                 "language": "javascript",
-                "error_type": error_type,
+                "error": error_msg,
                 "occurences": 1,
                 "priority": 5,
                 "server": '',
                 "http_status": 500,
-                'report_details': []
-            }
-            if (this.requestInfo != null && typeof this.requestInfo.server != 'undefined') {
-                report.server = this.requestInfo.server;
-            }
-            var detail = this.collectDetails();
+                "request": {},
+                "traceback": [],
+            };
+            report.user_agent = window.navigator.userAgent;
+            report.start_time = new Date().toJSON();
+
+            if (this.requestInfo != null) {
+                for (var i in this.requestInfo) {
+                    report[i] = this.requestInfo[i];
+                }
+            };
+
+            if (typeof report.request_id == 'undefined' || !report.request_id) {
+                report.request_id = this.genUUID4();
+            };
+
             for (var i = errorReport.stack.length - 1; i >= 0; i--) {
                 // console.log(errorReport.stack[i])
                 var stackline = {'cline': '',
                     'file': errorReport.stack[i].url,
                     'fn': errorReport.stack[i].func,
                     'line': errorReport.stack[i].line,
-                    'vars': []}
-                detail.frameinfo.push(stackline);
+                    'vars': []};
+                report.traceback.push(stackline);
             }
-            detail.frameinfo[detail.frameinfo.length - 1].cline = error_type
-            report.report_details.push(detail);
+            if(report.traceback.length > 0){
+                report.traceback[report.traceback.length - 1].cline = error_msg;
+            }
             this.errorReportBuffer.push(report);
         },
         log: function (level, message, namespace, uuid) {
@@ -162,24 +173,6 @@
             xhr.open("POST", endpoint, true);
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(JSON.stringify(data));
-        },
-
-        collectDetails: function () {
-            var detail = {
-                user_agent: window.navigator.userAgent,
-                start_time: new Date().toJSON(),
-                frameinfo: []
-            };
-            if (this.requestInfo != null) {
-                for (var i in this.requestInfo) {
-                    detail[i] = this.requestInfo[i];
-                }
-            }
-            if (typeof detail.request_id == 'undefined' || !detail.request_id) {
-                detail.request_id = this.genUUID4();
-            }
-            return detail
-
         }
     }
     window.AppEnlight = AppEnlight;
