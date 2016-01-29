@@ -81,11 +81,12 @@
         },
 
         handleError: function (errorReport) {
+            var error_msg = '';
             if (errorReport.mode == 'stack') {
-                var error_msg = errorReport.name + ': ' + errorReport.message;
+                error_msg = errorReport.name + ': ' + errorReport.message;
             }
             else {
-                var error_msg = errorReport.message;
+                error_msg = errorReport.message;
             }
             var report = {
                 "client": "javascript",
@@ -143,10 +144,10 @@
         },
         log: function (level, message, namespace, uuid) {
             if (typeof namespace == 'undefined') {
-                var namespace = window.location.pathname;
+                namespace = window.location.pathname;
             }
             if (typeof uuid == 'undefined') {
-                var uuid = null;
+                uuid = null;
             }
             this.logBuffer.push(
                 {
@@ -154,7 +155,7 @@
                     "message": message,
                     "date": new Date().toJSON(),
                     "namespace": namespace
-                })
+                });
             if (this.requestInfo != null && typeof this.requestInfo.server != 'undefined') {
                 this.logBuffer[this.logBuffer.length - 1].server = this.requestInfo.server;
             }
@@ -197,7 +198,7 @@
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(JSON.stringify(data));
         }
-    }
+    };
     window.AppEnlight = AppEnlight;
 
     if ( typeof define === "function" && define.amd ) {
