@@ -2,7 +2,7 @@
     "use strict";
 
     var AppEnlight = {
-        version: '0.4.0',
+        version: '0.4.1',
         options: {
             apiKey: ""
         },
@@ -87,7 +87,6 @@
             else {
                 var error_msg = errorReport.message;
             }
-            // console.log(errorReport);
             var report = {
                 "client": "javascript",
                 "language": "javascript",
@@ -111,7 +110,6 @@
             if (typeof report.request_id == 'undefined' || !report.request_id) {
                 report.request_id = this.genUUID4();
             }
-            console.log(errorReport);
             // grab last 100 frames in reversed order
             var stack_slice = errorReport.stack.reverse().slice(-100);
             for (var i = 0; i < stack_slice.length; i++) {
