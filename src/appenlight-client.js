@@ -2,7 +2,7 @@
     "use strict";
 
     var AppEnlight = {
-        version: '0.3.2',
+        version: '0.4.0',
         options: {
             apiKey: ""
         },
@@ -13,21 +13,27 @@
 
         init: function (options) {
             var self = this;
-            if (typeof options.server == 'undefined') {
+            if (typeof options.server === 'undefined') {
                 options.server = "https://api.appenlight.com";
             }
-            if (typeof options.apiKey == 'undefined') {
+            if (typeof options.apiKey === 'undefined') {
                 options.apiKey = "undefined";
             }
-            if (typeof options.protocol_version == 'undefined') {
+            if (typeof options.protocol_version === 'undefined') {
                 options.protocol_version = "0.5";
             }
-            if (typeof options.windowOnError == 'undefined' ||
+            if (typeof options.windowOnError === 'undefined' ||
                 options.windowOnError == false) {
                 TraceKit.collectWindowErrors = false;
             }
-            if (typeof options.sendInterval == 'undefined') {
+            if (typeof options.sendInterval === 'undefined') {
                 options.sendInterval = 1000;
+            }
+            if (typeof options.tracekitRemoteFetching === 'undefined') {
+                options.tracekitRemoteFetching = true;
+            }
+            if (typeof options.tracekitContextLines === 'undefined') {
+                options.tracekitContextLines = 11;
             }
             if (options.sendInterval >= 1000) {
                 this.createSendInterval(options.sendInterval);
@@ -40,7 +46,9 @@
             this.logsEndpoint = options.server
                 + '/api/logs?public_api_key=' + this.options.apiKey
                 + "&protocol_version=" + this.options.protocol_version;
-            TraceKit.remoteFetching = false;
+
+            TraceKit.remoteFetching = options.tracekitRemoteFetching;
+            TraceKit.linesOfContext = options.tracekitContextLines;
             TraceKit.report.subscribe(function (errorReport) {
                 self.handleError(errorReport);
             });
@@ -77,7 +85,7 @@
                 var error_msg = errorReport.name + ': ' + errorReport.message;
             }
             else {
-                var error_type = errorReport.message;
+                var error_msg = errorReport.message;
             }
             // console.log(errorReport);
             var report = {
@@ -98,23 +106,40 @@
                 for (var i in this.requestInfo) {
                     report[i] = this.requestInfo[i];
                 }
-            };
+            }
 
             if (typeof report.request_id == 'undefined' || !report.request_id) {
                 report.request_id = this.genUUID4();
-            };
-
-            for (var i = errorReport.stack.length - 1; i >= 0; i--) {
-                // console.log(errorReport.stack[i])
-                var stackline = {'cline': '',
-                    'file': errorReport.stack[i].url,
-                    'fn': errorReport.stack[i].func,
-                    'line': errorReport.stack[i].line,
+            }
+            console.log(errorReport);
+            // grab last 100 frames in reversed order
+            var stack_slice = errorReport.stack.reverse().slice(-100);
+            for (var i = 0; i < stack_slice.length; i++) {
+                var context = '';
+                try{
+                    if (stack_slice[i].context){
+                        for(var j = 0; j < stack_slice[i].context.length; j++){
+                            var line = stack_slice[i].context[j];
+                            if (line.length > 300){
+                                context += '<minified-context>';
+                            }
+                            else{
+                                context += line;
+                            }
+                            context += '\n';
+                        }
+                    }
+                }
+                catch(e){}
+                var stackline = {'cline': context,
+                    'file': stack_slice[i].url,
+                    'fn': stack_slice[i].func,
+                    'line': stack_slice[i].line,
                     'vars': []};
                 report.traceback.push(stackline);
             }
             if(report.traceback.length > 0){
-                report.traceback[report.traceback.length - 1].cline = error_msg;
+                report.traceback[report.traceback.length - 1].cline = context + '\n' + error_msg;
             }
             this.errorReportBuffer.push(report);
         },
