@@ -1,12 +1,25 @@
-/* jshint browser: true */
-/* globals document window TraceKit */
 (function (window) {
-    "use strict";
+    'use strict';
+
+    var buildContextString = function(contextLines){
+        var context = '';
+        for(var k = 0; k < contextLines.length; k++){
+            var line = contextLines[k];
+            if (line.length > 300){
+                context += '<minified-context>';
+            }
+            else{
+                context += line;
+            }
+            context += '\n';
+        }
+        return context;
+    };
 
     var AppEnlight = {
         version: '0.4.1',
         options: {
-            apiKey: ""
+            apiKey: ''
         },
         errorReportBuffer: [],
         slowReportBuffer: [],
@@ -16,13 +29,13 @@
         init: function (options) {
             var self = this;
             if (typeof options.server === 'undefined') {
-                options.server = "https://api.appenlight.com";
+                options.server = 'https://api.appenlight.com';
             }
             if (typeof options.apiKey === 'undefined') {
-                options.apiKey = "undefined";
+                options.apiKey = 'undefined';
             }
-            if (typeof options.protocol_version === 'undefined') {
-                options.protocol_version = "0.5";
+            if (typeof options.protocolVersion === 'undefined') {
+                options.protocolVersion = '0.5';
             }
             if (typeof options.windowOnError === 'undefined' ||
                 options.windowOnError === false) {
@@ -44,10 +57,10 @@
             this.requestInfo = { url: window.location.href };
             this.reportsEndpoint = options.server +
                 '/api/reports?public_api_key=' + this.options.apiKey +
-                "&protocol_version=" + this.options.protocol_version;
+                '&protocolVersion=' + this.options.protocolVersion;
             this.logsEndpoint = options.server +
                 '/api/logs?public_api_key=' + this.options.apiKey +
-                "&protocol_version=" + this.options.protocol_version;
+                '&protocolVersion=' + this.options.protocolVersion;
 
             TraceKit.remoteFetching = options.tracekitRemoteFetching;
             TraceKit.linesOfContext = options.tracekitContextLines;
@@ -56,12 +69,12 @@
             });
         },
 
-        createSendInterval: function (time_iv) {
+        createSendInterval: function (timeIv) {
             var self = this;
-            this.send_iv = setInterval(function () {
+            this.sendIv = setInterval(function () {
                 self.sendReports();
                 self.sendLogs();
-            }, time_iv);
+            }, timeIv);
         },
 
         setRequestInfo: function (info) {
@@ -74,37 +87,38 @@
             // we need to catch rethrown exception but throw an error from TraceKit
             try {
                 TraceKit.report(exception);
-            } catch (new_exception) {
-                if (exception !== new_exception) {
-                    throw new_exception;
+            } catch (newException) {
+                if (exception !== newException) {
+                    throw newException;
                 }
             }
 
         },
 
         handleError: function (errorReport) {
-            var error_msg = '';
+            /*jshint camelcase: false */
+            var errorMsg = '';
             if (errorReport.mode === 'stack') {
-                error_msg = errorReport.name + ': ' + errorReport.message;
+                errorMsg = errorReport.name + ': ' + errorReport.message;
             }
             else {
-                error_msg = errorReport.message;
+                errorMsg = errorReport.message;
             }
             var report = {
-                "client": "javascript",
-                "language": "javascript",
-                "error": error_msg,
-                "occurences": 1,
-                "priority": 5,
-                "server": '',
-                "http_status": 500,
-                "request": {},
-                "traceback": []
+                'client': 'javascript',
+                'language': 'javascript',
+                'error': errorMsg,
+                'occurences': 1,
+                'priority': 5,
+                'server': '',
+                'http_status': 500,
+                'request': {},
+                'traceback': []
             };
             report.user_agent = window.navigator.userAgent;
             report.start_time = new Date().toJSON();
 
-            if (this.requestInfo != null) {
+            if (this.requestInfo !== null) {
                 for (var i in this.requestInfo) {
                     report[i] = this.requestInfo[i];
                 }
@@ -120,16 +134,7 @@
                 var frame = stackSlice[j];
                 try{
                     if (frame.context){
-                        for(var k = 0; k < frame.context.length; k++){
-                            var line = frame.context[k];
-                            if (line.length > 300){
-                                context += '<minified-context>';
-                            }
-                            else{
-                                context += line;
-                            }
-                            context += '\n';
-                        }
+                        context = buildContextString(frame.context);
                     }
                 }
                 catch(e){}
@@ -141,8 +146,8 @@
                 report.traceback.push(stackline);
             }
             if(report.traceback.length > 0){
-                var lastFrameContext = stackSlice[stackSlice.length-1].context;
-                report.traceback[report.traceback.length - 1].cline = lastFrameContext + '\n' + error_msg;
+                var ctxString = buildContextString(stackSlice[stackSlice.length-1].context);
+                report.traceback[report.traceback.length - 1].cline = ctxString + '\n' + errorMsg;
             }
             this.errorReportBuffer.push(report);
         },
@@ -155,10 +160,10 @@
             }
             this.logBuffer.push(
                 {
-                    "log_level": level.toUpperCase(),
-                    "message": message,
-                    "date": new Date().toJSON(),
-                    "namespace": namespace
+                    'log_level': level.toUpperCase(),
+                    'message': message,
+                    'date': new Date().toJSON(),
+                    'namespace': namespace
                 });
             if (this.requestInfo !== null && typeof this.requestInfo.server !== 'undefined') {
                 this.logBuffer[this.logBuffer.length - 1].server = this.requestInfo.server;
@@ -196,17 +201,17 @@
         submitData: function (endpoint, data) {
             var xhr = new window.XMLHttpRequest();
             if (!xhr && window.ActiveXObject) {
-                xhr = new window.ActiveXObject("Microsoft.XMLHTTP");
+                xhr = new window.ActiveXObject('Microsoft.XMLHTTP');
             }
-            xhr.open("POST", endpoint, true);
-            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.open('POST', endpoint, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify(data));
         }
     };
     window.AppEnlight = AppEnlight;
 
-    if ( typeof define === "function" && define.amd ) {
-        define( "appenlight", [], function() {
+    if ( typeof define === 'function' && define.amd ) {
+        define( 'appenlight', [], function() {
             return AppEnlight;
         });
     }

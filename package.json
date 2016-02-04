@@ -7,7 +7,8 @@
         "grunt-contrib-nodeunit": "",
         "grunt-contrib-uglify": "",
         "grunt-contrib-concat": "",
-        "grunt-contrib-watch": ""
+        "grunt-contrib-watch": "",
+        "grunt-remove-logging": ""
     }
 }
 

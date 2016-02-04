@@ -11,15 +11,15 @@ module.exports = function(grunt) {
         "src/tracekit.js",
     ],
         dest: 'appenlight-client.js'
-      },
+      }
     },
     jshint: {
       options: {
-        jshintrc: true,
+        jshintrc: '.jshintrc',
       },
-      files: {
+      appenlight: {
         src: ['src/appenlight-client.js']
-      },
+      }
     },
     uglify: {
       options: {
@@ -41,6 +41,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks("grunt-remove-logging");
 
   grunt.registerTask('test', ['jshint']);
 
