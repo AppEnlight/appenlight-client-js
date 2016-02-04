@@ -1,3 +1,5 @@
+/* jshint browser: true */
+/* globals document window TraceKit */
 (function (window) {
     "use strict";
 
@@ -82,7 +84,7 @@
 
         handleError: function (errorReport) {
             var error_msg = '';
-            if (errorReport.mode == 'stack') {
+            if (errorReport.mode === 'stack') {
                 error_msg = errorReport.name + ': ' + errorReport.message;
             }
             else {
@@ -97,18 +99,18 @@
                 "server": '',
                 "http_status": 500,
                 "request": {},
-                "traceback": [],
+                "traceback": []
             };
             report.user_agent = window.navigator.userAgent;
             report.start_time = new Date().toJSON();
 
-            if (this.requestInfo !== null) {
+            if (this.requestInfo != null) {
                 for (var i in this.requestInfo) {
                     report[i] = this.requestInfo[i];
                 }
             }
 
-            if (typeof report.request_id == 'undefined' || !report.request_id) {
+            if (typeof report.request_id === 'undefined' || !report.request_id) {
                 report.request_id = this.genUUID4();
             }
             // grab last 100 frames in reversed order
@@ -139,16 +141,16 @@
                 report.traceback.push(stackline);
             }
             if(report.traceback.length > 0){
-                var lastFrameContext = stackSlice[j][-1].context;
+                var lastFrameContext = stackSlice[stackSlice.length-1].context;
                 report.traceback[report.traceback.length - 1].cline = lastFrameContext + '\n' + error_msg;
             }
             this.errorReportBuffer.push(report);
         },
         log: function (level, message, namespace, uuid) {
-            if (typeof namespace == 'undefined') {
+            if (typeof namespace === 'undefined') {
                 namespace = window.location.pathname;
             }
-            if (typeof uuid == 'undefined') {
+            if (typeof uuid === 'undefined') {
                 uuid = null;
             }
             this.logBuffer.push(
@@ -158,7 +160,7 @@
                     "date": new Date().toJSON(),
                     "namespace": namespace
                 });
-            if (this.requestInfo !== null && typeof this.requestInfo.server != 'undefined') {
+            if (this.requestInfo !== null && typeof this.requestInfo.server !== 'undefined') {
                 this.logBuffer[this.logBuffer.length - 1].server = this.requestInfo.server;
             }
         },
@@ -166,7 +168,7 @@
         genUUID4: function () {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
                 /[xy]/g, function (c) {
-                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : r & 0x3 | 0x8;
+                    var r = Math.random() * 16 | 0, v = c === 'x' ? r : r & 0x3 | 0x8;
                     return v.toString(16);
                 }
             );

@@ -99,7 +99,7 @@
                 "server": '',
                 "http_status": 500,
                 "request": {},
-                "traceback": [],
+                "traceback": []
             };
             report.user_agent = window.navigator.userAgent;
             report.start_time = new Date().toJSON();
@@ -141,7 +141,7 @@
                 report.traceback.push(stackline);
             }
             if(report.traceback.length > 0){
-                var lastFrameContext = stackSlice[j][-1].context;
+                var lastFrameContext = stackSlice[stackSlice.length-1].context;
                 report.traceback[report.traceback.length - 1].cline = lastFrameContext + '\n' + error_msg;
             }
             this.errorReportBuffer.push(report);
