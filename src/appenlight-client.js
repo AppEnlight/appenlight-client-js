@@ -23,7 +23,7 @@
                 options.protocol_version = "0.5";
             }
             if (typeof options.windowOnError === 'undefined' ||
-                options.windowOnError == false) {
+                options.windowOnError === false) {
                 TraceKit.collectWindowErrors = false;
             }
             if (typeof options.sendInterval === 'undefined') {
@@ -40,12 +40,12 @@
             }
             this.options = options;
             this.requestInfo = { url: window.location.href };
-            this.reportsEndpoint = options.server
-                + '/api/reports?public_api_key=' + this.options.apiKey
-                + "&protocol_version=" + this.options.protocol_version;
-            this.logsEndpoint = options.server
-                + '/api/logs?public_api_key=' + this.options.apiKey
-                + "&protocol_version=" + this.options.protocol_version;
+            this.reportsEndpoint = options.server +
+                '/api/reports?public_api_key=' + this.options.apiKey +
+                "&protocol_version=" + this.options.protocol_version;
+            this.logsEndpoint = options.server +
+                '/api/logs?public_api_key=' + this.options.apiKey +
+                "&protocol_version=" + this.options.protocol_version;
 
             TraceKit.remoteFetching = options.tracekitRemoteFetching;
             TraceKit.linesOfContext = options.tracekitContextLines;
@@ -102,7 +102,7 @@
             report.user_agent = window.navigator.userAgent;
             report.start_time = new Date().toJSON();
 
-            if (this.requestInfo != null) {
+            if (this.requestInfo !== null) {
                 for (var i in this.requestInfo) {
                     report[i] = this.requestInfo[i];
                 }
@@ -138,7 +138,8 @@
                 report.traceback.push(stackline);
             }
             if(report.traceback.length > 0){
-                report.traceback[report.traceback.length - 1].cline = context + '\n' + error_msg;
+                var lastFrameContext = stack_slice[i][-1].context;
+                report.traceback[report.traceback.length - 1].cline = lastFrameContext + '\n' + error_msg;
             }
             this.errorReportBuffer.push(report);
         },
@@ -156,7 +157,7 @@
                     "date": new Date().toJSON(),
                     "namespace": namespace
                 });
-            if (this.requestInfo != null && typeof this.requestInfo.server != 'undefined') {
+            if (this.requestInfo !== null && typeof this.requestInfo.server != 'undefined') {
                 this.logBuffer[this.logBuffer.length - 1].server = this.requestInfo.server;
             }
         },
