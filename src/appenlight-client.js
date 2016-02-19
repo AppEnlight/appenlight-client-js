@@ -3,21 +3,23 @@
 
     var buildContextString = function(contextLines){
         var context = '';
-        for(var k = 0; k < contextLines.length; k++){
-            var line = contextLines[k];
-            if (line.length > 300){
-                context += '<minified-context>';
+        if (contextLines){
+            for(var k = 0; k < contextLines.length; k++){
+                var line = contextLines[k];
+                if (line.length > 300){
+                    context += '<minified-context>';
+                }
+                else{
+                    context += line;
+                }
+                context += '\n';
             }
-            else{
-                context += line;
-            }
-            context += '\n';
         }
         return context;
     };
 
     var AppEnlight = {
-        version: '0.4.1',
+        version: '0.4.2',
         options: {
             apiKey: ''
         },
@@ -133,12 +135,13 @@
                 var context = '';
                 var frame = stackSlice[j];
                 try{
-                    if (frame.context){
+                    if (typeof frame.context !== 'undefined'){
                         context = buildContextString(frame.context);
                     }
                 }
                 catch(e){}
-                var stackline = {'cline': context,
+                var stackline = {
+                    'cline': context,
                     'file': frame.url,
                     'fn': frame.func,
                     'line': frame.line,
@@ -146,8 +149,11 @@
                 report.traceback.push(stackline);
             }
             if(report.traceback.length > 0){
-                var ctxString = buildContextString(stackSlice[stackSlice.length-1].context);
-                report.traceback[report.traceback.length - 1].cline = ctxString + '\n' + errorMsg;
+                var lastFrame = stackSlice[stackSlice.length-1];
+                if (typeof lastFrame.context !== 'undefined'){
+                    var ctxString = buildContextString(lastFrame.context);
+                    report.traceback[report.traceback.length - 1].cline = ctxString + '\n' + errorMsg;
+                }
             }
             this.errorReportBuffer.push(report);
         },
