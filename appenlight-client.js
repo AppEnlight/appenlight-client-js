@@ -1,23 +1,31 @@
 (function (window) {
     'use strict';
 
-    var buildContextString = function(contextLines){
+    var buildContextString = function (contextLines) {
         var context = '';
-        for(var k = 0; k < contextLines.length; k++){
-            var line = contextLines[k];
-            if (line.length > 300){
-                context += '<minified-context>';
+        if (contextLines) {
+            for (var k = 0; k < contextLines.length; k++) {
+                try{
+                    var line = contextLines[k];
+                    if (line.length > 300) {
+                        context += '<minified-context>';
+                    }
+                    else {
+                        context += line;
+                    }
+
+                }
+                catch(exc){
+                    context += '<error-parsing-context>';
+                }
+                context += '\n';
             }
-            else{
-                context += line;
-            }
-            context += '\n';
         }
         return context;
     };
 
     var AppEnlight = {
-        version: '0.4.1',
+        version: '0.4.2',
         options: {
             apiKey: ''
         },
@@ -25,6 +33,8 @@
         slowReportBuffer: [],
         logBuffer: [],
         requestInfo: null,
+        extraInfo: [],
+        tags: [],
 
         init: function (options) {
             var self = this;
@@ -54,7 +64,7 @@
                 this.createSendInterval(options.sendInterval);
             }
             this.options = options;
-            this.requestInfo = { url: window.location.href };
+            this.requestInfo = {url: window.location.href};
             this.reportsEndpoint = options.server +
                 '/api/reports?public_api_key=' + this.options.apiKey +
                 '&protocolVersion=' + this.options.protocolVersion;
@@ -83,10 +93,31 @@
             }
         },
 
-        grabError: function (exception) {
+        clearGlobalExtra: function () {
+            this.extraInfo = [];
+        },
+
+        addGlobalExtra: function (info) {
+            for (var i in info) {
+                this.extraInfo.push([i, info[i]]);
+            }
+        },
+
+        clearGlobalTags: function () {
+            this.tags = [];
+        },
+
+        addGlobalTags: function (info) {
+            for (var i in info) {
+                this.tags.push([i, info[i]]);
+            }
+        },
+
+        grabError: function (exception, options) {
             // we need to catch rethrown exception but throw an error from TraceKit
             try {
-                TraceKit.report(exception);
+                var report = TraceKit.computeStackTrace(exception);
+                this.handleError(report, options);
             } catch (newException) {
                 if (exception !== newException) {
                     throw newException;
@@ -95,7 +126,7 @@
 
         },
 
-        handleError: function (errorReport) {
+        handleError: function (errorReport, options) {
             /*jshint camelcase: false */
             var errorMsg = '';
             if (errorReport.mode === 'stack') {
@@ -113,7 +144,9 @@
                 'server': '',
                 'http_status': 500,
                 'request': {},
-                'traceback': []
+                'traceback': [],
+                'extra': [],
+                'tags': []
             };
             report.user_agent = window.navigator.userAgent;
             report.start_time = new Date().toJSON();
@@ -121,6 +154,26 @@
             if (this.requestInfo !== null) {
                 for (var i in this.requestInfo) {
                     report[i] = this.requestInfo[i];
+                }
+            }
+
+            if (this.extraInfo !== null) {
+                report.extra = this.extraInfo;
+            }
+
+            if (this.tags !== null) {
+                report.tags = this.tags;
+            }
+
+            if (options && typeof options.extra !== 'undefined'){
+                for (var k in options.extra) {
+                    report.extra.push([k, options.extra[k]]);
+                }
+            }
+
+            if (options && typeof options.tags !== 'undefined'){
+                for (var l in options.tags) {
+                    this.tags.push([l, options.tags[l]]);
                 }
             }
 
@@ -132,22 +185,29 @@
             for (var j = 0; j < stackSlice.length; j++) {
                 var context = '';
                 var frame = stackSlice[j];
-                try{
-                    if (frame.context){
+                try {
+                    if (typeof frame.context !== 'undefined') {
                         context = buildContextString(frame.context);
                     }
                 }
-                catch(e){}
-                var stackline = {'cline': context,
+                catch (e) {
+                }
+                var stackline = {
+                    'cline': context,
                     'file': frame.url,
                     'fn': frame.func,
                     'line': frame.line,
-                    'vars': []};
+                    'vars': []
+                };
                 report.traceback.push(stackline);
             }
-            if(report.traceback.length > 0){
-                var ctxString = buildContextString(stackSlice[stackSlice.length-1].context);
-                report.traceback[report.traceback.length - 1].cline = ctxString + '\n' + errorMsg;
+            if (report.traceback.length > 0) {
+                var lastFrame = stackSlice[stackSlice.length - 1];
+                if (typeof lastFrame.context !== 'undefined') {
+                    var ctxString = buildContextString(lastFrame.context);
+                    var msg = ctxString + '\n' + errorMsg;
+                    report.traceback[report.traceback.length - 1].cline = msg;
+                }
             }
             this.errorReportBuffer.push(report);
         },
@@ -210,8 +270,8 @@
     };
     window.AppEnlight = AppEnlight;
 
-    if ( typeof define === 'function' && define.amd ) {
-        define( 'appenlight', [], function() {
+    if (typeof define === 'function' && define.amd) {
+        define('appenlight', [], function () {
             return AppEnlight;
         });
     }

@@ -33,7 +33,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: ['<%= concat.dist.src %>'],
-      tasks: ['concat']
+      tasks: ['jshint', 'concat']
     }
   });
 
@@ -41,7 +41,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks("grunt-remove-logging");
+  //grunt.loadNpmTasks("grunt-remove-logging");
 
   grunt.registerTask('test', ['jshint']);
 
