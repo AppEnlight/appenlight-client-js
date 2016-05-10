@@ -1,7 +1,7 @@
 appenlight_client_javascript
 ============================
 
-.. image:: https://appenlight.com/static/images/logos/js_small.png
+.. image:: http://getappenlight.com/static/images/logos/js_small.png
    :alt: JS Logo
 
 
