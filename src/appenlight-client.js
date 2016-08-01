@@ -23,6 +23,7 @@
         }
         return context;
     };
+    var logLevels = ['debug', 'info', 'warning', 'error', 'critical'];
 
     var AppEnlight = {
         version: '0.4.2',
@@ -268,6 +269,23 @@
             xhr.send(JSON.stringify(data));
         }
     };
+
+    // Create a function that calls through to the log method with the
+    // specified log level
+    function logLevelMethod(logLevel) {
+        return function() {
+            var args = [].slice.call(arguments);
+            args.unshift(logLevel);
+            return this.log.apply(this, args);
+        };
+    }
+
+    // Add methods for each log level
+    for (var i in logLevels) {
+        var logLevel = logLevels[i];
+        AppEnlight[logLevel] = logLevelMethod(logLevel);
+    }
+
     window.AppEnlight = AppEnlight;
 
     if (typeof define === 'function' && define.amd) {
