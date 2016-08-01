@@ -10,52 +10,53 @@ appenlight_client_javascript
 Usage Example
 -------------
 
-## Include the script on your page
+Include the script on your page
+===============================
 
 First, please obtain latest copy of javascript client from our [**Github repository**](https://github.com/AppEnlight/appenlight-client-js).
 
 Or use CDN hosted version from jsDelivr (http://www.jsdelivr.com/#!appenlight).
 
-Next you can include the file on your pages directly or asynchroneously:
+Next you can include the file on your pages directly or asynchronously:
 
 Installation and Setup
 ======================
 
-**Load the script asynchroneously**::
+**Load the script asynchronously**::
 
     var initAppEnlight = function () {
       if(this.readyState!='loading'){
           AppEnlight.init({
-              apiKey:'PUBLIC_API_KEY',
+              apiKey: 'PUBLIC_API_KEY',
               windowOnError: 1 // enable to hook to window.onerror
           });
           // setting request info is completly optional
           AppEnlight.setRequestInfo({
-              server:'servername',
-              username:'i_am_mario',
-              ip: "127.0.0.1",
-              request_id:"server_generated_uuid"
+              server: 'servername',
+              username: 'i_am_mario',
+              ip: '127.0.0.1',
+              request_id: 'server_generated_uuid'
           });
       }
     };
-    //  load the script asynchroneously
+    //  load the script asynchronously
     var scrElem = document.createElement('script');
     scrElem.type = 'text/javascript';
     scrElem.async = true;
     scrElem.onload = scrElem.onreadystatechange = initAppEnlight;
-    scrElem.src = "//cdn.jsdelivr.net/appenlight/0.2.0/appenlight-client.min.js";
+    scrElem.src = '//cdn.jsdelivr.net/appenlight/0.2.0/appenlight-client.min.js';
     var p = document.getElementsByTagName('script')[0];
     p.parentNode.insertBefore(scrElem, p);
 
 
-At this point client is configured and will automaticly stream all data to
+At this point client is configured and will automatically stream all data to
 our servers every 1 second if it has anything in its buffers.
 
 If `windowOnError` config option is enabled the client will process all unhandled
-exceptions for you. Remember though that window.onerror stacks contain minimal amount
-of information, for best results you want to do explict exception catching.
+exceptions for you. Remember though that window.onerror stacks contain a minimal amount
+of information; for best results you want to do explicit exception catching.
 
-Please *avoid* throwing string exceptions, if possible use `throw new Error()` instead.
+Please *avoid* throwing string exceptions; if possible use `throw new Error()` instead.
 
 ** EXPLICIT ERROR CATCHING - EXAMPLE**::
 
@@ -69,6 +70,6 @@ Please *avoid* throwing string exceptions, if possible use `throw new Error()` i
 
 **LOGGING - EXAMPLE**::
 
-    AppEnlight.log('error',"some test message");
-    AppEnlight.log('info',"some info message");
-    AppEnlight.log('warning',"some warn message");
+    AppEnlight.log('error','some test message');
+    AppEnlight.log('info','some info message');
+    AppEnlight.log('warning','some warn message');
