@@ -11,5 +11,6 @@
     "grunt-contrib-uglify": "",
     "grunt-contrib-watch": "",
     "grunt-remove-logging": "",
+    "load-grunt-tasks": "^3.5.0"
   }
 }
