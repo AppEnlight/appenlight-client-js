@@ -38,6 +38,7 @@
         tags: [],
 
         init: function (options) {
+            options = options || {};
             var self = this;
             if (typeof options.server === 'undefined') {
                 options.server = 'https://api.appenlight.com';
@@ -112,6 +113,14 @@
             for (var i in info) {
                 this.tags.push([i, info[i]]);
             }
+        },
+
+        clearGlobalNamespace: function () {
+            this.options.namespace = undefined;
+        },
+
+        setGlobalNamespace: function (namespace) {
+            this.options.namespace = namespace;
         },
 
         grabError: function (exception, options) {
@@ -214,7 +223,12 @@
         },
         log: function (level, message, namespace, uuid) {
             if (typeof namespace === 'undefined') {
-                namespace = window.location.pathname;
+                if (typeof this.options.namespace !== 'undefined') {
+                    namespace = this.options.namespace;
+                }
+                else {
+                    namespace = window.location.pathname;
+                }
             }
             if (typeof uuid === 'undefined') {
                 uuid = null;
