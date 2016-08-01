@@ -1,15 +1,20 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    bumpup: {
+      files: ['bower.json', 'package.json']
+    },
     concat: {
       options: {
-        separator: '\n'
+        separator: '\n',
+        // Interpolate grunt template tags (e.g. <%= pkg.version %>)
+        process: true
       },
       dist: {
         src: [
-        "src/appenlight-client.js",
-        "src/tracekit.js",
-    ],
+          'src/appenlight-client.js',
+          'src/tracekit.js',
+        ],
         dest: 'appenlight-client.js'
       }
     },
@@ -42,6 +47,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   //grunt.loadNpmTasks("grunt-remove-logging");
+  grunt.loadNpmTasks('grunt-bumpup');
 
   grunt.registerTask('test', ['jshint']);
 

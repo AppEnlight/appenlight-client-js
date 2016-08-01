@@ -25,7 +25,7 @@
     };
 
     var AppEnlight = {
-        version: '0.4.2',
+        version: '<%= pkg.version %>',
         options: {
             apiKey: ''
         },
