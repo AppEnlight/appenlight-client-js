@@ -1,10 +1,10 @@
 {
-  "name": "appenlight",
-  "version": "0.3.2",
+  "name": "appenlight-client",
+  "version": "0.4.2",
   "authors": [
     "Marcin Lulek <info@webreactor.eu>"
   ],
-  "description": "Appenlight JS client",
+  "description": "Javascript client for App Enlight",
   "main": "appenlight-client.js",
   "license": "BSD",
   "homepage": "https://appenlight.com",
