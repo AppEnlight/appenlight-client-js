@@ -26,7 +26,7 @@
     var logLevels = ['debug', 'info', 'warning', 'error', 'critical'];
 
     var AppEnlight = {
-        version: '0.4.2',
+        version: '<%= pkg.version %>',
         options: {
             apiKey: ''
         },

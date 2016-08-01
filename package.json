@@ -1,14 +1,16 @@
 {
-    "name": "appenlight-client",
-    "description": "Javascript client for App Enlight",
-    "devDependencies": {
-        "grunt": "",
-        "grunt-contrib-jshint": "",
-        "grunt-contrib-nodeunit": "",
-        "grunt-contrib-uglify": "",
-        "grunt-contrib-concat": "",
-        "grunt-contrib-watch": "",
-        "grunt-remove-logging": ""
-    }
+  "name": "appenlight-client",
+  "version": "0.4.2",
+  "description": "Javascript client for App Enlight",
+  "devDependencies": {
+    "grunt": "",
+    "grunt-bumpup": "",
+    "grunt-contrib-concat": "",
+    "grunt-contrib-jshint": "",
+    "grunt-contrib-nodeunit": "",
+    "grunt-contrib-uglify": "",
+    "grunt-contrib-watch": "",
+    "grunt-remove-logging": "",
+    "load-grunt-tasks": "^3.5.0"
+  }
 }
-
