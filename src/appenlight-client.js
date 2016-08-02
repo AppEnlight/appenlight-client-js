@@ -238,7 +238,8 @@
                     'log_level': level.toUpperCase(),
                     'message': message,
                     'date': new Date().toJSON(),
-                    'namespace': namespace
+                    'namespace': namespace,
+                    'request_id': uuid
                 });
             if (this.requestInfo !== null && typeof this.requestInfo.server !== 'undefined') {
                 this.logBuffer[this.logBuffer.length - 1].server = this.requestInfo.server;
