@@ -92,6 +92,10 @@
             }, timeIv);
         },
 
+        clearRequestInfo: function () {
+            this.requestInfo = {};
+        },
+
         setRequestInfo: function (info) {
             for (var i in info) {
                 this.requestInfo[i] = info[i];
