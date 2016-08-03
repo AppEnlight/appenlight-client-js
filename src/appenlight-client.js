@@ -65,7 +65,11 @@
             if (options.sendInterval >= 1000) {
                 this.createSendInterval(options.sendInterval);
             }
-            this.options = options;
+
+            for (var k in options) {
+                this.options[k] = options[k];
+            }
+
             this.requestInfo = {url: window.location.href};
             this.reportsEndpoint = options.server +
                 '/api/reports?public_api_key=' + this.options.apiKey +
