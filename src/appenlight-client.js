@@ -33,7 +33,7 @@
         errorReportBuffer: [],
         slowReportBuffer: [],
         logBuffer: [],
-        requestInfo: null,
+        requestInfo: {},
         extraInfo: [],
         tags: [],
 
@@ -70,7 +70,6 @@
                 this.options[k] = options[k];
             }
 
-            this.requestInfo = {url: window.location.href};
             this.reportsEndpoint = options.server +
                 '/api/reports?public_api_key=' + this.options.apiKey +
                 '&protocolVersion=' + this.options.protocolVersion;
@@ -160,7 +159,8 @@
                 'request': {},
                 'traceback': [],
                 'extra': [],
-                'tags': []
+                'tags': [],
+                'url': window.location.href
             };
             report.user_agent = window.navigator.userAgent;
             report.start_time = new Date().toJSON();
