@@ -33,7 +33,7 @@
         errorReportBuffer: [],
         slowReportBuffer: [],
         logBuffer: [],
-        requestInfo: null,
+        requestInfo: {},
         extraInfo: [],
         tags: [],
 
@@ -65,8 +65,11 @@
             if (options.sendInterval >= 1000) {
                 this.createSendInterval(options.sendInterval);
             }
-            this.options = options;
-            this.requestInfo = {url: window.location.href};
+
+            for (var k in options) {
+                this.options[k] = options[k];
+            }
+
             this.reportsEndpoint = options.server +
                 '/api/reports?public_api_key=' + this.options.apiKey +
                 '&protocolVersion=' + this.options.protocolVersion;
@@ -87,6 +90,10 @@
                 self.sendReports();
                 self.sendLogs();
             }, timeIv);
+        },
+
+        clearRequestInfo: function () {
+            this.requestInfo = {};
         },
 
         setRequestInfo: function (info) {
@@ -156,7 +163,8 @@
                 'request': {},
                 'traceback': [],
                 'extra': [],
-                'tags': []
+                'tags': [],
+                'url': window.location.href
             };
             report.user_agent = window.navigator.userAgent;
             report.start_time = new Date().toJSON();
@@ -168,11 +176,11 @@
             }
 
             if (this.extraInfo !== null) {
-                report.extra = this.extraInfo;
+                report.extra = report.extra.concat(this.extraInfo);
             }
 
             if (this.tags !== null) {
-                report.tags = this.tags;
+                report.tags = report.tags.concat(this.tags);
             }
 
             if (options && typeof options.extra !== 'undefined'){
@@ -238,7 +246,8 @@
                     'log_level': level.toUpperCase(),
                     'message': message,
                     'date': new Date().toJSON(),
-                    'namespace': namespace
+                    'namespace': namespace,
+                    'request_id': uuid
                 });
             if (this.requestInfo !== null && typeof this.requestInfo.server !== 'undefined') {
                 this.logBuffer[this.logBuffer.length - 1].server = this.requestInfo.server;
