@@ -229,7 +229,7 @@
             }
             this.errorReportBuffer.push(report);
         },
-        log: function (level, message, namespace, uuid) {
+        log: function (level, message, namespace, uuid, tags) {
             if (typeof namespace === 'undefined') {
                 if (typeof this.options.namespace !== 'undefined') {
                     namespace = this.options.namespace;
@@ -241,17 +241,28 @@
             if (typeof uuid === 'undefined') {
                 uuid = null;
             }
-            this.logBuffer.push(
-                {
-                    'log_level': level.toUpperCase(),
-                    'message': message,
-                    'date': new Date().toJSON(),
-                    'namespace': namespace,
-                    'request_id': uuid
-                });
-            if (this.requestInfo !== null && typeof this.requestInfo.server !== 'undefined') {
-                this.logBuffer[this.logBuffer.length - 1].server = this.requestInfo.server;
+            var logInfo = {
+                'log_level': level.toUpperCase(),
+                'message': message,
+                'date': new Date().toJSON(),
+                'namespace': namespace,
+                'request_id': uuid
+            };
+
+            if (this.requestInfo && typeof this.requestInfo.server !== 'undefined') {
+                logInfo.server = this.requestInfo.server;
             }
+
+            if ((tags && tags.length > 0) || this.tags.length > 0) {
+                logInfo.tags = [].concat(this.tags);
+                if (tags) {
+                    for (var i in tags) {
+                        logInfo.tags.push([i, tags[i]]);
+                    }
+                }
+            }
+
+            this.logBuffer.push(logInfo);
         },
 
         genUUID4: function () {
