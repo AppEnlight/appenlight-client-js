@@ -168,11 +168,11 @@
             }
 
             if (this.extraInfo !== null) {
-                report.extra = this.extraInfo;
+                report.extra = report.extra.concat(this.extraInfo);
             }
 
             if (this.tags !== null) {
-                report.tags = this.tags;
+                report.tags = report.tags.concat(this.tags);
             }
 
             if (options && typeof options.extra !== 'undefined'){
