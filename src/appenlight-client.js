@@ -1,28 +1,6 @@
 (function (window) {
     'use strict';
 
-    var buildContextString = function (contextLines) {
-        var context = '';
-        if (contextLines) {
-            for (var k = 0; k < contextLines.length; k++) {
-                try{
-                    var line = contextLines[k];
-                    if (line.length > 300) {
-                        context += '<minified-context>';
-                    }
-                    else {
-                        context += line;
-                    }
-
-                }
-                catch(exc){
-                    context += '<error-parsing-context>';
-                }
-                context += '\n';
-            }
-        }
-        return context;
-    };
     var logLevels = ['debug', 'info', 'warning', 'error', 'critical'];
 
     var AppEnlight = {
@@ -275,6 +253,34 @@
             }
         }
         return target;
+    }
+
+    // Given an array of context lines, format as a string with one per lines
+    function buildContextString(contextLines) {
+        if (contextLines) {
+            var context = new Array(contextLines.length + 1);
+            
+            for (var k = 0; k < contextLines.length; k++) {
+                try{
+                    var line = contextLines[k];
+                    if (line.length > 300) {
+                        context[k] = '<minified-context>';
+                    }
+                    else {
+                        context[k] = line;
+                    }
+
+                }
+                catch(exc){
+                    context[k] = '<error-parsing-context>';
+                }
+            }
+            // Join will include a trailing \n if there are context lines
+            context[k] = '';
+
+            return context.join('\n');
+        }
+        return '';
     }
 
     // Determine whether a property with the specified key is defined in the
