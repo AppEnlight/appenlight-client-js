@@ -28,7 +28,13 @@
     var AppEnlight = {
         version: '<%= pkg.version %>',
         options: {
-            apiKey: ''
+            apiKey: 'undefined',
+            protocolVersion: '0.5',
+            sendInterval: 1000,
+            server: 'https://api.appenlight.com',
+            tracekitContextLines: 11,
+            tracekitRemoteFetching: true,
+            windowOnError: false
         },
         errorReportBuffer: [],
         slowReportBuffer: [],
@@ -38,47 +44,24 @@
         tags: {},
 
         init: function (options) {
-            options = options || {};
             var self = this;
-            if (typeof options.server === 'undefined') {
-                options.server = 'https://api.appenlight.com';
-            }
-            if (typeof options.apiKey === 'undefined') {
-                options.apiKey = 'undefined';
-            }
-            if (typeof options.protocolVersion === 'undefined') {
-                options.protocolVersion = '0.5';
-            }
-            if (typeof options.windowOnError === 'undefined' ||
-                options.windowOnError === false) {
-                TraceKit.collectWindowErrors = false;
-            }
-            if (typeof options.sendInterval === 'undefined') {
-                options.sendInterval = 1000;
-            }
-            if (typeof options.tracekitRemoteFetching === 'undefined') {
-                options.tracekitRemoteFetching = true;
-            }
-            if (typeof options.tracekitContextLines === 'undefined') {
-                options.tracekitContextLines = 11;
-            }
-            if (options.sendInterval >= 1000) {
-                this.createSendInterval(options.sendInterval);
+
+            assign(this.options, options);
+
+            if (this.options.sendInterval >= 1000) {
+                this.createSendInterval(this.options.sendInterval);
             }
 
-            for (var k in options) {
-                this.options[k] = options[k];
-            }
-
-            this.reportsEndpoint = options.server +
+            this.reportsEndpoint = this.options.server +
                 '/api/reports?public_api_key=' + this.options.apiKey +
                 '&protocolVersion=' + this.options.protocolVersion;
-            this.logsEndpoint = options.server +
+            this.logsEndpoint = this.options.server +
                 '/api/logs?public_api_key=' + this.options.apiKey +
                 '&protocolVersion=' + this.options.protocolVersion;
 
-            TraceKit.remoteFetching = options.tracekitRemoteFetching;
-            TraceKit.linesOfContext = options.tracekitContextLines;
+            TraceKit.collectWindowErrors = this.options.windowOnError;
+            TraceKit.remoteFetching = this.options.tracekitRemoteFetching;
+            TraceKit.linesOfContext = this.options.tracekitContextLines;
             TraceKit.report.subscribe(function (errorReport) {
                 self.handleError(errorReport);
             });
@@ -177,13 +160,9 @@
             report.user_agent = window.navigator.userAgent;
             report.start_time = new Date().toJSON();
 
-            if (this.requestInfo !== null) {
-                for (var i in this.requestInfo) {
-                    report[i] = this.requestInfo[i];
-                }
-            }
+            assign(report, this.requestInfo);
 
-            if (typeof report.request_id === 'undefined' || !report.request_id) {
+            if (!report.request_id) {
                 report.request_id = this.genUUID4();
             }
             // grab last 100 frames in reversed order
@@ -194,6 +173,11 @@
                 try {
                     if (typeof frame.context !== 'undefined') {
                         context = buildContextString(frame.context);
+
+                        // Add the error message to the last frame
+                        if (j === stackSlice.length - 1) {
+                            context += '\n' + errorMsg;
+                        }
                     }
                 }
                 catch (e) {
@@ -206,14 +190,6 @@
                     'vars': []
                 };
                 report.traceback.push(stackline);
-            }
-            if (report.traceback.length > 0) {
-                var lastFrame = stackSlice[stackSlice.length - 1];
-                if (typeof lastFrame.context !== 'undefined') {
-                    var ctxString = buildContextString(lastFrame.context);
-                    var msg = ctxString + '\n' + errorMsg;
-                    report.traceback[report.traceback.length - 1].cline = msg;
-                }
             }
             this.errorReportBuffer.push(report);
         },
@@ -329,7 +305,7 @@
     }
 
     // Add methods for each log level
-    for (var i in logLevels) {
+    for (var i = 0; i < logLevels.length; i++) {
         var logLevel = logLevels[i];
         AppEnlight[logLevel] = logLevelMethod(logLevel);
     }
