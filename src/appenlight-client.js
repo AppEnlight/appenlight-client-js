@@ -113,6 +113,7 @@
         },
 
         handleError: function (errorReport, options) {
+            options = options || {};
             /*jshint camelcase: false */
             var errorMsg = '';
             if (errorReport.mode === 'stack') {
