@@ -34,8 +34,8 @@
         slowReportBuffer: [],
         logBuffer: [],
         requestInfo: {},
-        extraInfo: [],
-        tags: [],
+        extraInfo: {},
+        tags: {},
 
         init: function (options) {
             options = options || {};
@@ -97,29 +97,37 @@
         },
 
         setRequestInfo: function (info) {
-            for (var i in info) {
-                this.requestInfo[i] = info[i];
-            }
+            assign(this.requestInfo, info);
         },
 
-        clearGlobalExtra: function () {
-            this.extraInfo = [];
+        clearGlobalExtra: function (keys) {
+            if (keys) {
+                for (var i = 0; i < keys.length; i++) {
+                    delete this.extraInfo[keys[i]];
+                }
+            }
+            else {
+                this.extraInfo = {};
+            }
         },
 
         addGlobalExtra: function (info) {
-            for (var i in info) {
-                this.extraInfo.push([i, info[i]]);
-            }
+            assign(this.extraInfo, info);
         },
 
-        clearGlobalTags: function () {
-            this.tags = [];
+        clearGlobalTags: function (keys) {
+            if (keys) {
+                for (var i = 0; i < keys.length; i++) {
+                    delete this.tags[keys[i]];
+                }
+            }
+            else {
+                this.tags = {};
+            }
         },
 
         addGlobalTags: function (info) {
-            for (var i in info) {
-                this.tags.push([i, info[i]]);
-            }
+            assign(this.tags, info);
         },
 
         clearGlobalNamespace: function () {
@@ -162,8 +170,8 @@
                 'http_status': 500,
                 'request': {},
                 'traceback': [],
-                'extra': [],
-                'tags': [],
+                'extra': toPairs(assign({}, this.extraInfo, options.extra)),
+                'tags': toPairs(assign({}, this.tags, options.tags)),
                 'url': window.location.href
             };
             report.user_agent = window.navigator.userAgent;
@@ -172,26 +180,6 @@
             if (this.requestInfo !== null) {
                 for (var i in this.requestInfo) {
                     report[i] = this.requestInfo[i];
-                }
-            }
-
-            if (this.extraInfo !== null) {
-                report.extra = report.extra.concat(this.extraInfo);
-            }
-
-            if (this.tags !== null) {
-                report.tags = report.tags.concat(this.tags);
-            }
-
-            if (options && typeof options.extra !== 'undefined'){
-                for (var k in options.extra) {
-                    report.extra.push([k, options.extra[k]]);
-                }
-            }
-
-            if (options && typeof options.tags !== 'undefined'){
-                for (var l in options.tags) {
-                    this.tags.push([l, options.tags[l]]);
                 }
             }
 
@@ -246,22 +234,14 @@
                 'message': message,
                 'date': new Date().toJSON(),
                 'namespace': namespace,
-                'request_id': uuid
+                'request_id': uuid,
+                'tags': toPairs(assign({}, this.tags, tags))
             };
 
             if (this.requestInfo && typeof this.requestInfo.server !== 'undefined') {
                 logInfo.server = this.requestInfo.server;
             }
-
-            if ((tags && tags.length > 0) || this.tags.length > 0) {
-                logInfo.tags = [].concat(this.tags);
-                if (tags) {
-                    for (var i in tags) {
-                        logInfo.tags.push([i, tags[i]]);
-                    }
-                }
-            }
-
+            
             this.logBuffer.push(logInfo);
         },
 
@@ -304,6 +284,29 @@
         }
     };
 
+    // Shallow copy of own enumerable properties into the target object from
+    // any number of source objects.
+    function assign(target) {
+        target = Object(target);
+        for (var i = 1; i < arguments.length; i++) {
+            var source = arguments[i];
+            if (source) {
+                for (var k in source) {
+                    if (hasOwnProperty(source, k)) {
+                        target[k] = source[k];
+                    }
+                }
+            }
+        }
+        return target;
+    }
+
+    // Determine whether a property with the specified key is defined in the
+    // object, ignoring properties inherited from the object's prototype
+    function hasOwnProperty(obj, key) {
+        return Object.prototype.hasOwnProperty.call(obj, key);
+    }
+
     // Create a function that calls through to the log method with the
     // specified log level
     function logLevelMethod(logLevel) {
@@ -312,6 +315,17 @@
             args.unshift(logLevel);
             return this.log.apply(this, args);
         };
+    }
+    
+    // Convert object to an array of [key, value] pairs
+    function toPairs(obj) {
+        var pairs = [];
+        for (var k in obj) {
+            if (hasOwnProperty(obj, k)) {
+                pairs.push([k, obj[k]]);
+            }
+        }
+        return pairs;
     }
 
     // Add methods for each log level
