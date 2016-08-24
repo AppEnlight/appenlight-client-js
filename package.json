@@ -2,6 +2,7 @@
   "name": "appenlight-client",
   "version": "0.4.2",
   "description": "Javascript client for App Enlight",
+  "main": "appenlight-client.js",
   "devDependencies": {
     "grunt": "",
     "grunt-bumpup": "",
