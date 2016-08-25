@@ -58,7 +58,7 @@ of information; for best results you want to do explicit exception catching.
 
 Please *avoid* throwing string exceptions; if possible use `throw new Error()` instead.
 
-** EXPLICIT ERROR CATCHING - EXAMPLE**::
+**EXPLICIT ERROR CATCHING - EXAMPLE**::
 
     try{
       1 + non_existing_var;
@@ -68,8 +68,72 @@ Please *avoid* throwing string exceptions; if possible use `throw new Error()` i
 
 
 
-**LOGGING - EXAMPLE**::
+**LOGGING**
+
+The log level (one of ``debug``, ``info``, ``warning``, ``error``, or
+``critical``) and a message are required for each log call::
 
     AppEnlight.log('error','some test message');
     AppEnlight.log('info','some info message');
     AppEnlight.log('warning','some warn message');
+
+
+The ``log`` method supports three additional arguments for customization of
+the namespace, a unique ID for grouping logs, and tags. To avoid overriding
+global values, use ``undefined`` for the namespace value::
+
+    AppEnlight.log('info', 'Message A');                       // Default namespace, window.location.pathname
+    AppEnlight.setGlobalNamespace('my_script');
+    AppEnlight.log('info', 'Message B');                       // Global namespace, my_script
+    AppEnlight.log('info', 'Message C', 'script_main');        // Custom namespace script_main
+    AppEnlight.log('info', 'Message C', null, requestID);      // null namespace
+    AppEnlight.log('info', 'Message C', undefined, requestID); // Global namespace, my_script
+
+
+**GLOBAL CONFIGURATION**
+
+**Namespace**
+
+The namespace can be provided on each ``log`` call or applied to all logging
+via the global ``namespace`` option. Set the ``namespace`` option at
+initialization or manage it at runtime with
+``AppEnlight.[set|clear]GlobalNamespace``::
+    
+    AppEnlight.init({
+        apiKey: 'PUBLIC_API_KEY',
+        namespace: 'my_script'
+    });
+    // OR
+    AppEnlight.setGlobalNamespace('my_script');
+
+
+**Tags and Extra**
+
+Tags and extra can be specified globally or on the individual ``log`` and
+``grabError`` level::
+
+    AppEnlight.addGlobalTags({ widget: 'A', mobile: true });
+    AppEnlight.log('info', undefined, undefined, { widget: 'B', button: 'send' });
+    // Log will include the tags mobile: true, widget: 'B', button: 'send'
+
+    try{
+      1 + non_existing_var;
+    }catch(exc){
+      AppEnlight.grabError(exc, { tags: { widget: 'B' } });
+    }
+
+
+If a key already exists its value will be overridden::
+
+    AppEnlight.addGlobalTags({ widget: 'A' });
+    AppEnlight.addGlobalTags({ widget: 'B' });
+    // Logs and reports will send the tag widget: 'B'
+
+
+Use ``clearGlobal[Tags|Extra]`` to remove keys and their corresponding values.
+Individual keys and values can be removed by passing an array with the keys to
+remove::
+
+    AppEnlight.clearGlobalTags([ 'widget' ]); // Remove only the widget key
+    AppEnlight.clearGlobalExtra();            // Remove all keys and values
+
