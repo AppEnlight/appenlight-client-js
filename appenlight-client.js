@@ -1,79 +1,45 @@
 (function (window) {
     'use strict';
 
-    var buildContextString = function (contextLines) {
-        var context = '';
-        if (contextLines) {
-            for (var k = 0; k < contextLines.length; k++) {
-                try{
-                    var line = contextLines[k];
-                    if (line.length > 300) {
-                        context += '<minified-context>';
-                    }
-                    else {
-                        context += line;
-                    }
-
-                }
-                catch(exc){
-                    context += '<error-parsing-context>';
-                }
-                context += '\n';
-            }
-        }
-        return context;
-    };
+    var logLevels = ['debug', 'info', 'warning', 'error', 'critical'];
 
     var AppEnlight = {
-        version: '0.4.2',
+        version: '0.5.0',
         options: {
-            apiKey: ''
+            apiKey: 'undefined',
+            protocolVersion: '0.5',
+            sendInterval: 1000,
+            server: 'https://api.appenlight.com',
+            tracekitContextLines: 11,
+            tracekitRemoteFetching: true,
+            windowOnError: false
         },
         errorReportBuffer: [],
         slowReportBuffer: [],
         logBuffer: [],
-        requestInfo: null,
-        extraInfo: [],
-        tags: [],
+        requestInfo: {},
+        extraInfo: {},
+        tags: {},
 
         init: function (options) {
             var self = this;
-            if (typeof options.server === 'undefined') {
-                options.server = 'https://api.appenlight.com';
+
+            assign(this.options, options);
+
+            if (this.options.sendInterval >= 1000) {
+                this.createSendInterval(this.options.sendInterval);
             }
-            if (typeof options.apiKey === 'undefined') {
-                options.apiKey = 'undefined';
-            }
-            if (typeof options.protocolVersion === 'undefined') {
-                options.protocolVersion = '0.5';
-            }
-            if (typeof options.windowOnError === 'undefined' ||
-                options.windowOnError === false) {
-                TraceKit.collectWindowErrors = false;
-            }
-            if (typeof options.sendInterval === 'undefined') {
-                options.sendInterval = 1000;
-            }
-            if (typeof options.tracekitRemoteFetching === 'undefined') {
-                options.tracekitRemoteFetching = true;
-            }
-            if (typeof options.tracekitContextLines === 'undefined') {
-                options.tracekitContextLines = 11;
-            }
-            if (options.sendInterval >= 1000) {
-                this.createSendInterval(options.sendInterval);
-            }
-            this.options = options;
-            this.requestInfo = {url: window.location.href};
-            this.reportsEndpoint = options.server +
+
+            this.reportsEndpoint = this.options.server +
                 '/api/reports?public_api_key=' + this.options.apiKey +
                 '&protocolVersion=' + this.options.protocolVersion;
-            this.logsEndpoint = options.server +
+            this.logsEndpoint = this.options.server +
                 '/api/logs?public_api_key=' + this.options.apiKey +
                 '&protocolVersion=' + this.options.protocolVersion;
 
-            TraceKit.remoteFetching = options.tracekitRemoteFetching;
-            TraceKit.linesOfContext = options.tracekitContextLines;
+            TraceKit.collectWindowErrors = this.options.windowOnError;
+            TraceKit.remoteFetching = this.options.tracekitRemoteFetching;
+            TraceKit.linesOfContext = this.options.tracekitContextLines;
             TraceKit.report.subscribe(function (errorReport) {
                 self.handleError(errorReport);
             });
@@ -87,30 +53,50 @@
             }, timeIv);
         },
 
-        setRequestInfo: function (info) {
-            for (var i in info) {
-                this.requestInfo[i] = info[i];
-            }
+        clearRequestInfo: function () {
+            this.requestInfo = {};
         },
 
-        clearGlobalExtra: function () {
-            this.extraInfo = [];
+        setRequestInfo: function (info) {
+            assign(this.requestInfo, info);
+        },
+
+        clearGlobalExtra: function (keys) {
+            if (keys) {
+                for (var i = 0; i < keys.length; i++) {
+                    delete this.extraInfo[keys[i]];
+                }
+            }
+            else {
+                this.extraInfo = {};
+            }
         },
 
         addGlobalExtra: function (info) {
-            for (var i in info) {
-                this.extraInfo.push([i, info[i]]);
-            }
+            assign(this.extraInfo, info);
         },
 
-        clearGlobalTags: function () {
-            this.tags = [];
+        clearGlobalTags: function (keys) {
+            if (keys) {
+                for (var i = 0; i < keys.length; i++) {
+                    delete this.tags[keys[i]];
+                }
+            }
+            else {
+                this.tags = {};
+            }
         },
 
         addGlobalTags: function (info) {
-            for (var i in info) {
-                this.tags.push([i, info[i]]);
-            }
+            assign(this.tags, info);
+        },
+
+        clearGlobalNamespace: function () {
+            this.options.namespace = undefined;
+        },
+
+        setGlobalNamespace: function (namespace) {
+            this.options.namespace = namespace;
         },
 
         grabError: function (exception, options) {
@@ -127,6 +113,7 @@
         },
 
         handleError: function (errorReport, options) {
+            options = options || {};
             /*jshint camelcase: false */
             var errorMsg = '';
             if (errorReport.mode === 'stack') {
@@ -145,39 +132,16 @@
                 'http_status': 500,
                 'request': {},
                 'traceback': [],
-                'extra': [],
-                'tags': []
+                'extra': toPairs(assign({}, this.extraInfo, options.extra)),
+                'tags': toPairs(assign({}, this.tags, options.tags)),
+                'url': window.location.href
             };
             report.user_agent = window.navigator.userAgent;
             report.start_time = new Date().toJSON();
 
-            if (this.requestInfo !== null) {
-                for (var i in this.requestInfo) {
-                    report[i] = this.requestInfo[i];
-                }
-            }
+            assign(report, this.requestInfo);
 
-            if (this.extraInfo !== null) {
-                report.extra = this.extraInfo;
-            }
-
-            if (this.tags !== null) {
-                report.tags = this.tags;
-            }
-
-            if (options && typeof options.extra !== 'undefined'){
-                for (var k in options.extra) {
-                    report.extra.push([k, options.extra[k]]);
-                }
-            }
-
-            if (options && typeof options.tags !== 'undefined'){
-                for (var l in options.tags) {
-                    this.tags.push([l, options.tags[l]]);
-                }
-            }
-
-            if (typeof report.request_id === 'undefined' || !report.request_id) {
+            if (!report.request_id) {
                 report.request_id = this.genUUID4();
             }
             // grab last 100 frames in reversed order
@@ -188,6 +152,11 @@
                 try {
                     if (typeof frame.context !== 'undefined') {
                         context = buildContextString(frame.context);
+
+                        // Add the error message to the last frame
+                        if (j === stackSlice.length - 1) {
+                            context += '\n' + errorMsg;
+                        }
                     }
                 }
                 catch (e) {
@@ -201,33 +170,34 @@
                 };
                 report.traceback.push(stackline);
             }
-            if (report.traceback.length > 0) {
-                var lastFrame = stackSlice[stackSlice.length - 1];
-                if (typeof lastFrame.context !== 'undefined') {
-                    var ctxString = buildContextString(lastFrame.context);
-                    var msg = ctxString + '\n' + errorMsg;
-                    report.traceback[report.traceback.length - 1].cline = msg;
-                }
-            }
             this.errorReportBuffer.push(report);
         },
-        log: function (level, message, namespace, uuid) {
+        log: function (level, message, namespace, uuid, tags) {
             if (typeof namespace === 'undefined') {
-                namespace = window.location.pathname;
+                if (typeof this.options.namespace !== 'undefined') {
+                    namespace = this.options.namespace;
+                }
+                else {
+                    namespace = window.location.pathname;
+                }
             }
             if (typeof uuid === 'undefined') {
                 uuid = null;
             }
-            this.logBuffer.push(
-                {
-                    'log_level': level.toUpperCase(),
-                    'message': message,
-                    'date': new Date().toJSON(),
-                    'namespace': namespace
-                });
-            if (this.requestInfo !== null && typeof this.requestInfo.server !== 'undefined') {
-                this.logBuffer[this.logBuffer.length - 1].server = this.requestInfo.server;
+            var logInfo = {
+                'log_level': level.toUpperCase(),
+                'message': message,
+                'date': new Date().toJSON(),
+                'namespace': namespace,
+                'request_id': uuid,
+                'tags': toPairs(assign({}, this.tags, tags))
+            };
+
+            if (this.requestInfo && typeof this.requestInfo.server !== 'undefined') {
+                logInfo.server = this.requestInfo.server;
             }
+            
+            this.logBuffer.push(logInfo);
         },
 
         genUUID4: function () {
@@ -268,6 +238,85 @@
             xhr.send(JSON.stringify(data));
         }
     };
+
+    // Shallow copy of own enumerable properties into the target object from
+    // any number of source objects.
+    function assign(target) {
+        target = Object(target);
+        for (var i = 1; i < arguments.length; i++) {
+            var source = arguments[i];
+            if (source) {
+                for (var k in source) {
+                    if (hasOwnProperty(source, k)) {
+                        target[k] = source[k];
+                    }
+                }
+            }
+        }
+        return target;
+    }
+
+    // Given an array of context lines, format as a string with one per lines
+    function buildContextString(contextLines) {
+        if (contextLines) {
+            var context = new Array(contextLines.length + 1);
+            
+            for (var k = 0; k < contextLines.length; k++) {
+                try{
+                    var line = contextLines[k];
+                    if (line.length > 300) {
+                        context[k] = '<minified-context>';
+                    }
+                    else {
+                        context[k] = line;
+                    }
+
+                }
+                catch(exc){
+                    context[k] = '<error-parsing-context>';
+                }
+            }
+            // Join will include a trailing \n if there are context lines
+            context[k] = '';
+
+            return context.join('\n');
+        }
+        return '';
+    }
+
+    // Determine whether a property with the specified key is defined in the
+    // object, ignoring properties inherited from the object's prototype
+    function hasOwnProperty(obj, key) {
+        return Object.prototype.hasOwnProperty.call(obj, key);
+    }
+
+    // Create a function that calls through to the log method with the
+    // specified log level
+    function logLevelMethod(logLevel) {
+        return function() {
+            var args = [].slice.call(arguments);
+            args.unshift(logLevel);
+            return this.log.apply(this, args);
+        };
+    }
+    
+    // Convert object to an array of [key, value] pairs
+    function toPairs(obj) {
+        var pairs = [];
+        for (var k in obj) {
+            if (hasOwnProperty(obj, k)) {
+                pairs.push([k, obj[k]]);
+            }
+        }
+        return pairs;
+    }
+
+    // Add methods for each log level
+    for (var i = 0; i < logLevels.length; i++) {
+        var logLevel = logLevels[i];
+        AppEnlight[logLevel] = logLevelMethod(logLevel);
+    }
+
     window.AppEnlight = AppEnlight;
 
     if (typeof define === 'function' && define.amd) {
