@@ -4,7 +4,7 @@
     var logLevels = ['debug', 'info', 'warning', 'error', 'critical'];
 
     var AppEnlight = {
-        version: '0.5.0',
+        version: '0.5.1',
         options: {
             apiKey: 'undefined',
             protocolVersion: '0.5',

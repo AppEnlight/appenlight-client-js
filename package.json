@@ -1,6 +1,6 @@
 {
   "name": "appenlight-client",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Javascript client for App Enlight",
   "main": "appenlight-client.js",
   "devDependencies": {
@@ -15,6 +15,5 @@
     "grunt-remove-logging": "",
     "load-grunt-tasks": "^3.5.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
