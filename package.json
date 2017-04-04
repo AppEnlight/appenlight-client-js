@@ -4,6 +4,7 @@
   "description": "Javascript client for App Enlight",
   "main": "appenlight-client.js",
   "devDependencies": {
+    "bower": "^1.8.0",
     "grunt": "",
     "grunt-bumpup": "",
     "grunt-contrib-concat": "",
@@ -13,5 +14,7 @@
     "grunt-contrib-watch": "",
     "grunt-remove-logging": "",
     "load-grunt-tasks": "^3.5.0"
+  },
+  "dependencies": {
   }
 }

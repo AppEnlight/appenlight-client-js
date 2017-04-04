@@ -13,7 +13,7 @@ module.exports = function(grunt) {
       dist: {
         src: [
           'src/appenlight-client.js',
-          'src/tracekit.js',
+          'bower_components/tracekit/tracekit.js',
         ],
         dest: 'appenlight-client.js'
       }
