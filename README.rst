@@ -44,7 +44,7 @@ Installation and Setup
     scrElem.type = 'text/javascript';
     scrElem.async = true;
     scrElem.onload = scrElem.onreadystatechange = initAppEnlight;
-    scrElem.src = '//cdn.jsdelivr.net/appenlight/0.2.0/appenlight-client.min.js';
+    scrElem.src = '//cdn.jsdelivr.net/gh/AppEnlight/appenlight-client-js@0.5.1/appenlight-client.min.js';
     var p = document.getElementsByTagName('script')[0];
     p.parentNode.insertBefore(scrElem, p);
 
